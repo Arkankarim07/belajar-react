@@ -7,7 +7,7 @@ export const FormRegister = () => {
               <InputForm label="Username" placeholder="Enter Your Username Here" type="text" name="username"/>
               <InputForm label="Password" placeholder="Enter Your password Here" type="password" name="password"/>
               <InputForm label="Confirm Password" placeholder="Confirm Your password Here" type="password" name="confirmpass"/>
-              <Button  warna="bg-blue-700 w-full"  text="Register"/>
+              <Button  warna="bg-blue-700 w-full">Register</Button>
         </form>
     )
 }
