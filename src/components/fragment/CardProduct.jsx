@@ -3,7 +3,7 @@
     // Penerapan Nested Component
     export const CardProduct = ({children}) => {
         return(
-                <div className="w-full max-w-80 mt-3 border-none rounded-lg bg-stone-900 shadow-lg flex flex-col">
+                <div className="w-full max-w-xs mt-3 border-none rounded-lg bg-stone-900 shadow-lg flex flex-col">
                     {children}
                 </div>
 
