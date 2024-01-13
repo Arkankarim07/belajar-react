@@ -1,6 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Button from "../components/elements/button"
 import { CardProduct } from "../components/fragment/CardProduct"
+import { Counter } from "../components/fragment/Counter"
 
 
 // rendering list
@@ -31,29 +32,35 @@ const products = [
 const email = localStorage.getItem("email")
 export const ProductPage = () => {
     // use state
-    const [cart, setCart] = useState([
-        {
-            id: 1,
-            qty: 1,
-        },
-    ])
+    const [cart, setCart] = useState([])
+    const [totalPrice, setTotalPrice] = useState(0)
 
-    // mengganti formatnya menjadi IDR
-    const FormatIdr = (harga) => {
-        return new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-        }).format(harga)
-    }
+    // Logika UseEffect
+    useEffect(() => {
+        // menyimpan ke localstorage
+        setCart(JSON.parse(localStorage.getItem("cart")) || [])
+    }, [])
 
+    useEffect(() => {
+        // jika ada isinya baru ditambahkan
+        if(cart.length > 0) {
+            const sum = cart.reduce((acc, item) => {
+                const product = products.find((product) => product.id === item.id)
+                return acc + product.harga * item.qty
+            }, 0)
+            setTotalPrice(sum)
+            localStorage.setItem("cart", JSON.stringify(cart))
+        }   
+    }, [cart])
 
+    
     const HandleAddToCart = (id) => {
         // jika item nya sudah pernah ditambahkan dia tidak membuat list baru sedangkan menambah qty nya
         if(cart.find((item) => item.id == id)) {
             setCart(cart.map((item) => item.id === id ? {...item, qty: item.qty + 1} : item))
         } else 
         {
-            // jika belum ada tambah 1
+            // jika belum ada, tambah 1
             setCart([...cart, {id, qty: 1}]) 
         }
     }
@@ -62,6 +69,14 @@ export const ProductPage = () => {
         localStorage.removeItem("email")
         localStorage.removeItem("password")
         window.location.href = '/'
+    }
+    
+    // mengganti formatnya menjadi IDR
+    const FormatIdr = (harga) => {
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+        }).format(harga)
     }
 
     return (
@@ -112,10 +127,16 @@ export const ProductPage = () => {
                                 </tr>
                             )
                         })}
+
+                        <tr>
+                            <td><b>Total Price</b></td>
+                            <td>RP. {(totalPrice).toLocaleString('id-ID')}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+            {/* <div className="mt-5 flex justify-center mb-5"><Counter></Counter> </div> */}
         </>
     )
 }
