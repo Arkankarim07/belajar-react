@@ -3,46 +3,60 @@ import Button from "../components/elements/button"
 import { CardProduct } from "../components/fragment/CardProduct"
 import { Counter } from "../components/fragment/Counter"
 import { getProductsApi } from "../services/product.service"
+import { getUsername } from "../services/auth.service"
 
 
 // rendering list
-const products = [
-    {
-        id: 1,
-        image: "../img/guitar-1.jpg",
-        name: "Guitar",
-        harga: 500000,
-        deskripsi: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil, nesciunt accusamus. Perferendis, temporibus! Eaque adipisci culpa explicabo. Iste, dolorum blanditiis.',
-    },
-    {
-        id: 2,
-        image: "../img/guitar-2.jpg",
-        name: "Guitar Electric",
-        harga: 1000000,
-        deskripsi: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit.',
-    },
-    {
-        id: 3,
-        image: "../img/guitar-2.jpg",
-        name: "Guitar Bejir",
-        harga: 1000000,
-        deskripsi: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit.',
-    },
-]
+// const products = [
+//     {
+//         id: 1,
+//         image: "../img/guitar-1.jpg",
+//         name: "Guitar",
+//         harga: 500000,
+//         deskripsi: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil, nesciunt accusamus. Perferendis, temporibus! Eaque adipisci culpa explicabo. Iste, dolorum blanditiis.',
+//     },
+//     {
+//         id: 2,
+//         image: "../img/guitar-2.jpg",
+//         name: "Guitar Electric",
+//         harga: 1000000,
+//         deskripsi: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit.',
+//     },
+//     {
+//         id: 3,
+//         image: "../img/guitar-2.jpg",
+//         name: "Guitar Bejir",
+//         harga: 1000000,
+//         deskripsi: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit.',
+//     },
+// ]
 
-const email = localStorage.getItem("email")
+
 export const ProductPage = () => {
     // Hook use state
     // Perubahan akan langsung diubah
     const [cart, setCart] = useState([])
     const [totalPrice, setTotalPrice] = useState(0)
     const [products, setProducts] = useState([])
+    const [username, setUsername] = useState("")
+    
+    
+    // mendapatkan username tetapi kita butuh memanggil fungsinya getUsername dari auth.service 
+    useEffect(() => {
+        const token = localStorage.getItem("token")
+        if (token) {
+            setUsername(getUsername(token))
+        } else {
+            window.location.href = "/"
+        }
+    }, [])
 
     // Logika UseEffect
     useEffect(() => {
         // menyimpan ke localstorage
         setCart(JSON.parse(localStorage.getItem("cart")) || [])
     }, [])
+
 
     useEffect(() => {
         // jika ada isinya baru ditambahkan
@@ -56,6 +70,7 @@ export const ProductPage = () => {
         }   
     }, [cart, products])
 
+    // memanggil api dari fakestoreapi
     useEffect(() => {
         getProductsApi((data) => {
             setProducts(data)
@@ -75,8 +90,7 @@ export const ProductPage = () => {
     }
     // Event Handler
     const HandleLogout = () => {
-        localStorage.removeItem("email")
-        localStorage.removeItem("password")
+        localStorage.removeItem("token")
         window.location.href = '/'
     }
     
@@ -111,7 +125,7 @@ export const ProductPage = () => {
     return (
         <>
         <div className="flex justify-between text-white px-6 items-center h-[60px] bg-slate-600">
-            {email}
+            {username}
             <Button onClick={HandleLogout}>Logout</Button>
             </div>
         <div className="flex w-4/5 justify-center py-5 ">
