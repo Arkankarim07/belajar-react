@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Button from "../components/elements/button"
 import { CardProduct } from "../components/fragment/CardProduct"
 import { Counter } from "../components/fragment/Counter"
+import { getProductsApi } from "../services/product.service"
 
 
 // rendering list
@@ -31,9 +32,11 @@ const products = [
 
 const email = localStorage.getItem("email")
 export const ProductPage = () => {
-    // use state
+    // Hook use state
+    // Perubahan akan langsung diubah
     const [cart, setCart] = useState([])
     const [totalPrice, setTotalPrice] = useState(0)
+    const [products, setProducts] = useState([])
 
     // Logika UseEffect
     useEffect(() => {
@@ -43,7 +46,7 @@ export const ProductPage = () => {
 
     useEffect(() => {
         // jika ada isinya baru ditambahkan
-        if(cart.length > 0) {
+        if(products.length > 0 && cart.length > 0) {
             const sum = cart.reduce((acc, item) => {
                 const product = products.find((product) => product.id === item.id)
                 return acc + product.harga * item.qty
@@ -51,7 +54,13 @@ export const ProductPage = () => {
             setTotalPrice(sum)
             localStorage.setItem("cart", JSON.stringify(cart))
         }   
-    }, [cart])
+    }, [cart, products])
+
+    useEffect(() => {
+        getProductsApi((data) => {
+            setProducts(data)
+        })
+    }, [])
 
     
     const HandleAddToCart = (id) => {
@@ -79,6 +88,26 @@ export const ProductPage = () => {
         }).format(harga)
     }
 
+    // Hook UseRef
+    // Perubahan tidak langsung diubah harus di refresh dahulu
+    const cartRef = useRef(JSON.parse(localStorage.getItem("cart")) || [])
+    
+    const handleAddToCartRef = (id) => {
+        cartRef.current = [...cartRef.current, {id, qty: 1}]
+        localStorage.setItem("cart", JSON.stringify(cartRef.current))
+    } 
+
+    const totalPriceRef = useRef(null)
+
+    // dengan menggenakan useRef dia bisa menggunakan Javascript DOM
+    // dan digabung dengan useEffect
+    useEffect(() => {
+        if(cart.length > 0 ) {
+            totalPriceRef.current.style.display = "block"
+        } else {
+            totalPriceRef.current.style.display = "none"
+        }
+    })
     return (
         <>
         <div className="flex justify-between text-white px-6 items-center h-[60px] bg-slate-600">
@@ -86,12 +115,12 @@ export const ProductPage = () => {
             <Button onClick={HandleLogout}>Logout</Button>
             </div>
         <div className="flex w-4/5 justify-center py-5 ">
-            <div className=" flex gap-4 justify-center flex-wrap">
-            {products.map((product) => (
+            <div className=" flex gap-4 justify-start flex-wrap">
+            {products.length > 0 && products.map((product) => (
             <CardProduct key={product.id}>
                 <CardProduct.Header image={product.image} />
-                    <CardProduct.Body name={product.name}>
-                    {product.deskripsi}
+                    <CardProduct.Body name={product.title}>
+                    {product.description}
                     </CardProduct.Body>
                 <CardProduct.Footer harga={product.harga} id={product.id} /* untuk menangkap id dari variable product */  AddToCart={HandleAddToCart}/>
             </CardProduct>
@@ -114,23 +143,23 @@ export const ProductPage = () => {
                         </tr>
                     </thead>
                     <tbody className=" bg-slate-100">
-                        {cart.map((item) => {
-                            const product = products.find((product) => product.id === item.id)
+                        {products.length > 0 && cart.map((item) => {
+                            const product =  products.find((product) => product.id === item.id)
                             return (
                                 <tr key={item.id}>
-                                    <td>{product.name}</td>
+                                    <td>{product.title.substring(0, 10)}..</td>
                                     {/* bisa dua cara agar mengganti formatnya menjadi IDR
                                     bisa memakai tolocalestring dan bisa menggunakan function (yang kita buat sendiri) */}
-                                    <td>Rp.{product.harga.toLocaleString('id-ID')}</td>
+                                    <td>${" "}{product.harga.toLocaleString('id-ID', {style: "currency", currency: "IDR"})}</td>
                                     <td>{item.qty}</td>
-                                    <td>{FormatIdr(item.qty * product.harga)}</td>
+                                    <td>${""}{FormatIdr(item.qty * product.harga)}</td>
                                 </tr>
                             )
                         })}
 
-                        <tr>
+                        <tr ref={totalPriceRef}>
                             <td><b>Total Price</b></td>
-                            <td>RP. {(totalPrice).toLocaleString('id-ID')}</td>
+                            <td>${" "}{(totalPrice).toLocaleString('id-ID', {style: "currency", currency: "IDR"})}</td>
                         </tr>
                     </tbody>
                 </table>
