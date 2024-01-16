@@ -21,3 +21,13 @@ export const getProductsApi = (callback) => {
             console.log(error);
         });
 };
+
+export const getDetailProductApi = (id, callback) => {
+    axios.get('https://fakestoreapi.com/products/' + id)
+        .then((response) => {
+            callback(response.data)
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+};

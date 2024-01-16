@@ -4,6 +4,7 @@ import { CardProduct } from "../components/fragment/CardProduct"
 import { Counter } from "../components/fragment/Counter"
 import { getProductsApi } from "../services/product.service"
 import { getUsername } from "../services/auth.service"
+import { useLogin } from "../hooks/useLogin"
 
 
 // rendering list
@@ -38,18 +39,11 @@ export const ProductPage = () => {
     const [cart, setCart] = useState([])
     const [totalPrice, setTotalPrice] = useState(0)
     const [products, setProducts] = useState([])
-    const [username, setUsername] = useState("")
+
+    // memanggil hook useLogin dari folder hooks
+    const username = useLogin()
     
     
-    // mendapatkan username tetapi kita butuh memanggil fungsinya getUsername dari auth.service 
-    useEffect(() => {
-        const token = localStorage.getItem("token")
-        if (token) {
-            setUsername(getUsername(token))
-        } else {
-            window.location.href = "/"
-        }
-    }, [])
 
     // Logika UseEffect
     useEffect(() => {
@@ -132,7 +126,7 @@ export const ProductPage = () => {
             <div className=" flex gap-4 justify-start flex-wrap">
             {products.length > 0 && products.map((product) => (
             <CardProduct key={product.id}>
-                <CardProduct.Header image={product.image} />
+                <CardProduct.Header image={product.image} id={product.id} />
                     <CardProduct.Body name={product.title}>
                     {product.description}
                     </CardProduct.Body>

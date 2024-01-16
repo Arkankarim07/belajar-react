@@ -1,4 +1,5 @@
-    import Button from "../elements/button"
+    import { Link } from "react-router-dom"
+import Button from "../elements/button"
 
     // Penerapan Nested Component
     export const CardProduct = ({children}) => {
@@ -10,11 +11,11 @@
         )
     } 
 
-    const Header = ({image}) => {
+    const Header = ({image, id}) => {
         return (
-            <a href="">
+            <Link to={`/product/detail/${id}`}>
                 <img src={image} className="p-8 h-72 w-full object-cover" alt="" />
-            </a>
+            </Link>
         )
     }
 
