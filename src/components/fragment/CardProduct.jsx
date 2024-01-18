@@ -1,5 +1,7 @@
     import { Link } from "react-router-dom"
-import Button from "../elements/button"
+    import Button from "../elements/button"
+    import { useDispatch } from "react-redux"
+    import { addToCart } from "../../redux/slices/cartSlices"
 
     // Penerapan Nested Component
     export const CardProduct = ({children}) => {
@@ -31,11 +33,12 @@ import Button from "../elements/button"
     }
 
 
-    const Footer = ({harga, AddToCart, id}) => {
+    const Footer = ({harga, id}) => {
+        const dispatch = useDispatch()
         return (
             <div className="flex items-center justify-between px-4 pb-4">
             <span className="text-2xl text-white font-bold">${""}{harga /* tolocalestring untuk mengubah menjadi IDR */}</span>
-            <Button className="px-2 text-sm" warna="bg-blue-600" onClick={() => AddToCart(id)}>Add to cart</Button>
+            <Button className="px-2 text-sm" warna="bg-blue-600" onClick={() => dispatch(addToCart({id, qty: 1}))}>Add to cart</Button>
         </div>
         )
     }
